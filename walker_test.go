@@ -9,60 +9,29 @@ import (
 )
 
 const (
-	tol = 10e-3
-	num = 10e5
+	tol = 10e-4
+	num = 10e6
 )
 
 func TestGenerate(t *testing.T) {
-	tc := []struct {
-		ws        []float64
-		normalize bool
-	}{
-		{
-			[]float64{0.5, 0.5},
-			false,
-		},
-		{
-			[]float64{0.2, 0.2, 0.2, 0.2, 0.2},
-			false,
-		},
-		{
-			[]float64{0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2},
-			true,
-		},
-		{
-			[]float64{0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5},
-			true,
-		},
-		{
-			[]float64{0.5, 1.5, 100.3},
-			true,
-		},
-		{
-			[]float64{23424124.23, 0.5},
-			true,
-		},
+	tc := [][]float64{
+		{0.5, 0.5},
+		{0.2, 0.2, 0.2, 0.2, 0.2},
+		{0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1},
+		{0.15, 0.3, 0.05, 0.4, 0.1},
 	}
 
 	for i, c := range tc {
-		// intentionally initialize seeds
+		// intentionally set seeds
 		rand.Seed(time.Now().UnixNano())
-		eRatio := make(map[int]float64, len(c.ws))
+		eRatio := make(map[int]float64, len(c))
 
-		var z float64 = 1
-		if c.normalize {
-			z = 0
-			for j := range c.ws {
-				z += c.ws[j]
-			}
+		for j := range c {
+			eRatio[j] = c[j]
 		}
 
-		for j := range c.ws {
-			eRatio[j] = c.ws[j] / z
-		}
-
-		s := GetSampler(c.ws, c.normalize)
-		ratio := make(map[int]float64, len(c.ws))
+		s := GetSampler(c)
+		ratio := make(map[int]float64, len(c))
 		for j := 0; j < num; j++ {
 			x := s.Generate()
 			ratio[x]++
@@ -73,7 +42,11 @@ func TestGenerate(t *testing.T) {
 		}
 
 		for j := range ratio {
-			if ratio[j]-eRatio[j] > tol {
+			diff := ratio[j] - eRatio[j]
+			if diff < 0 {
+				diff *= -1
+			}
+			if diff > tol {
 				t.Fatalf("%v-th test failed with \n ratio:%v \nexpected: %v", i, ratio, eRatio)
 			}
 		}
@@ -82,30 +55,15 @@ func TestGenerate(t *testing.T) {
 
 // check if GetSampler doesn't cause panic
 func TestGetSampler(t *testing.T) {
-	tc := []struct {
-		ws        []float64
-		normalize bool
-	}{
-		{
-			[]float64{0.5, 0.5},
-			false,
-		},
-		{
-			[]float64{0.2, 0.2, 0.2, 0.2, 0.2},
-			false,
-		},
-		{
-			[]float64{0.5, 1.5, 100.3},
-			true,
-		},
-		{
-			[]float64{23424124.23, 0.5},
-			true,
-		},
+	tc := [][]float64{
+		{0.5, 0.5},
+		{0.2, 0.2, 0.2, 0.2, 0.2},
+		{0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1},
+		{0.1, 0.3, 0.2, 0.4, 0.1},
 	}
 
 	for _, c := range tc {
-		GetSampler(c.ws, c.normalize)
+		GetSampler(c)
 	}
 }
 

@@ -24,7 +24,7 @@ func (s *Sampler) Generate() int {
 // GetSampler returns a sampler with Walker's sampling method.
 // The following is implemented according to `A Practical Version of Vose's Algorithm` in
 // http://www.keithschwarz.com/darts-dice-coins
-func GetSampler(ws []float64, normalize bool) *Sampler {
+func GetSampler(ws []float64) *Sampler {
 	// initialize a sampler
 	s := &Sampler{}
 	s.size = len(ws)
@@ -35,18 +35,9 @@ func GetSampler(ws []float64, normalize bool) *Sampler {
 	// create two work lists
 	var small, large []int
 
-	// if normalize == true, normalize the given weights so that they sum up to 1
-	var z float64 = 1
-	if normalize {
-		z = 0
-		for _, p := range ws {
-			z += p
-		}
-	}
-
 	// scale all of weights by `size`
 	for i := range ws {
-		ws[i] = (ws[i] * size64) / z
+		ws[i] = ws[i] * size64
 	}
 
 	for i, p := range ws {

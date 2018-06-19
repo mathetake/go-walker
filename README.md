@@ -12,7 +12,7 @@ import (
 
 func main() {
 	ws := []float64{0.3, 0.7}
-	s := walker.GetSampler(ws, false)
+	s := walker.GetSampler(ws)
 
 	for i := 0; i < 10; i++ {
 		fmt.Println(s.Generate())
