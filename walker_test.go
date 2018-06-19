@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	tol = 10e-5
-	num = 10e7
+	tol = 10e-3
+	num = 10e5
 )
 
 func TestGenerate(t *testing.T) {
@@ -65,8 +65,13 @@ func TestGenerate(t *testing.T) {
 		ratio := make(map[int]float64, len(c.ws))
 		for j := 0; j < num; j++ {
 			x := s.Generate()
-			ratio[x] += 1 / num
+			ratio[x]++
 		}
+
+		for j := range ratio {
+			ratio[j] /= num
+		}
+
 		for j := range ratio {
 			if ratio[j]-eRatio[j] > tol {
 				t.Fatalf("%v-th test failed with \n ratio:%v \nexpected: %v", i, ratio, eRatio)

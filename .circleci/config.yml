@@ -2,7 +2,7 @@ version: 2
 
 jobs:
   build:
-    working_directory: /go/src/github.com/mathetake/gann
+    working_directory: /go/src/github.com/mathetake/go-walker
     docker:
       - image: golang:1.10
     steps:
@@ -10,5 +10,4 @@ jobs:
       - run: go get -u github.com/golang/dep/...
       - run: dep ensure
       - run: go test -v -race ./...
-      - run: go test -bench .
       - run: go build .
